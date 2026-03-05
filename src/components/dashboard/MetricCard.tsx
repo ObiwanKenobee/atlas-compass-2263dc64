@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, forwardRef } from "react";
 import { TrendingUp, TrendingDown, X, BarChart3 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -17,7 +17,7 @@ interface MetricCardProps {
   };
 }
 
-const MetricCard = ({ label, value, unit, change, subtitle, children, className = "", drilldown }: MetricCardProps) => {
+const MetricCard = forwardRef<HTMLDivElement, MetricCardProps>(({ label, value, unit, change, subtitle, children, className = "", drilldown }, ref) => {
   const [showDrilldown, setShowDrilldown] = useState(false);
   const isPositive = change !== undefined && change >= 0;
 
