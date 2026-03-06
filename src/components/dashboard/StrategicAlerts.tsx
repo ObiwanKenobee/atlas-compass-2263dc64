@@ -1,4 +1,5 @@
 import { strategicAlerts } from "@/lib/dashboard-data";
+import { useStrategicAlerts, timeAgo } from "@/hooks/use-dashboard-data";
 import { FileText, Handshake, Leaf, ArrowRightLeft } from "lucide-react";
 import AnimatedSection from "./AnimatedSection";
 import { motion } from "framer-motion";
@@ -18,6 +19,17 @@ const colorMap = {
 };
 
 const StrategicAlerts = () => {
+  const { data: liveAlerts } = useStrategicAlerts();
+
+  const alerts = liveAlerts
+    ? liveAlerts.map((a) => ({
+        type: a.alert_type as keyof typeof iconMap,
+        title: a.title,
+        value: a.value,
+        time: timeAgo(a.created_at),
+      }))
+    : strategicAlerts;
+
   return (
     <AnimatedSection delay={0.05}>
       <section>
@@ -28,7 +40,7 @@ const StrategicAlerts = () => {
           </h2>
         </div>
         <div className="rounded-lg border border-border bg-card">
-          {strategicAlerts.map((alert, i) => {
+          {alerts.map((alert, i) => {
             const Icon = iconMap[alert.type];
             return (
               <motion.div
@@ -38,7 +50,7 @@ const StrategicAlerts = () => {
                 viewport={{ once: true }}
                 transition={{ duration: 0.3, delay: i * 0.05 }}
                 className={`flex items-start gap-4 px-5 py-4 transition-colors hover:bg-secondary/30 ${
-                  i !== strategicAlerts.length - 1 ? "border-b border-border" : ""
+                  i !== alerts.length - 1 ? "border-b border-border" : ""
                 }`}
               >
                 <Icon className={`mt-0.5 h-4 w-4 shrink-0 ${colorMap[alert.type]}`} />

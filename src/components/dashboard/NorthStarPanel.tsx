@@ -1,29 +1,41 @@
 import { useState, useMemo } from "react";
 import { northStarMetrics } from "@/lib/dashboard-data";
+import { useDashboardMetrics } from "@/hooks/use-dashboard-data";
 import MetricCard from "./MetricCard";
 import { TimeRangeSelector, type TimeRange } from "./TimeRangeSelector";
 import AnimatedSection from "./AnimatedSection";
 import { Area, AreaChart, ResponsiveContainer } from "recharts";
 
 const NorthStarPanel = () => {
-  const { arr, nrr, customerGrowth, cashRunway } = northStarMetrics;
+  const { data: liveMetrics } = useDashboardMetrics();
   const [timeRange, setTimeRange] = useState<TimeRange>("12M");
-
   const sliceCount = timeRange === "3M" ? 3 : timeRange === "6M" ? 6 : 12;
 
+  // Use live data with fallback to static
+  const arrValue = liveMetrics?.arr?.metric_value ?? northStarMetrics.arr.value;
+  const arrChange = liveMetrics?.arr?.change_percent ?? northStarMetrics.arr.change;
+  const arrTrend = (liveMetrics?.arr?.metadata?.trend as number[]) ?? northStarMetrics.arr.trend;
+  const arrMonths = (liveMetrics?.arr?.metadata?.months as string[]) ?? northStarMetrics.arr.months;
+
+  const nrrValue = liveMetrics?.nrr?.metric_value ?? northStarMetrics.nrr.value;
+  const nrrChange = liveMetrics?.nrr?.change_percent ?? northStarMetrics.nrr.change;
+  const nrrBenchmark = (liveMetrics?.nrr?.metadata?.benchmark as number) ?? northStarMetrics.nrr.benchmark;
+
+  const cgValue = liveMetrics?.customer_growth?.metric_value ?? northStarMetrics.customerGrowth.value;
+  const cgChange = liveMetrics?.customer_growth?.change_percent ?? northStarMetrics.customerGrowth.change;
+  const cgTotal = (liveMetrics?.customer_growth?.metadata?.totalCustomers as number) ?? northStarMetrics.customerGrowth.totalCustomers;
+  const cgTrend = (liveMetrics?.customer_growth?.metadata?.trend as number[]) ?? northStarMetrics.customerGrowth.trend;
+
+  const crValue = liveMetrics?.cash_runway?.metric_value ?? northStarMetrics.cashRunway.value;
+  const crBurn = (liveMetrics?.cash_runway?.metadata?.burnRate as number) ?? northStarMetrics.cashRunway.burnRate;
+  const crCash = (liveMetrics?.cash_runway?.metadata?.cashOnHand as number) ?? northStarMetrics.cashRunway.cashOnHand;
+
   const arrChartData = useMemo(
-    () =>
-      arr.months.slice(-sliceCount).map((month, i) => ({
-        month,
-        value: arr.trend.slice(-sliceCount)[i],
-      })),
-    [sliceCount]
+    () => arrMonths.slice(-sliceCount).map((month, i) => ({ month, value: arrTrend.slice(-sliceCount)[i] })),
+    [sliceCount, arrMonths, arrTrend]
   );
 
-  const customerTrendSliced = useMemo(
-    () => customerGrowth.trend.slice(-sliceCount),
-    [sliceCount]
-  );
+  const customerTrendSliced = useMemo(() => cgTrend.slice(-sliceCount), [sliceCount, cgTrend]);
 
   return (
     <AnimatedSection>
@@ -40,9 +52,9 @@ const NorthStarPanel = () => {
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <MetricCard
             label="Annual Recurring Revenue"
-            value={`$${arr.value}`}
+            value={`$${arrValue}`}
             unit="M"
-            change={arr.change}
+            change={arrChange ?? undefined}
             subtitle="YoY"
             drilldown={{
               title: "Annual Recurring Revenue",
@@ -66,14 +78,7 @@ const NorthStarPanel = () => {
                       <stop offset="100%" stopColor="hsl(152, 35%, 52%)" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <Area
-                    type="monotone"
-                    dataKey="value"
-                    stroke="hsl(152, 35%, 52%)"
-                    strokeWidth={1.5}
-                    fill="url(#arrGradient)"
-                    animationDuration={600}
-                  />
+                  <Area type="monotone" dataKey="value" stroke="hsl(152, 35%, 52%)" strokeWidth={1.5} fill="url(#arrGradient)" animationDuration={600} />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
@@ -81,10 +86,10 @@ const NorthStarPanel = () => {
 
           <MetricCard
             label="Net Revenue Retention"
-            value={nrr.value}
+            value={nrrValue}
             unit="%"
-            change={nrr.change}
-            subtitle={`Benchmark: ${nrr.benchmark}%`}
+            change={nrrChange ?? undefined}
+            subtitle={`Benchmark: ${nrrBenchmark}%`}
             drilldown={{
               title: "Net Revenue Retention",
               description: "Revenue retained and expanded from existing customers",
@@ -98,19 +103,16 @@ const NorthStarPanel = () => {
             }}
           >
             <div className="mt-1 h-1.5 rounded-full bg-secondary">
-              <div
-                className="h-full rounded-full bg-sage transition-all"
-                style={{ width: `${Math.min((nrr.value / 150) * 100, 100)}%` }}
-              />
+              <div className="h-full rounded-full bg-sage transition-all" style={{ width: `${Math.min((nrrValue / 150) * 100, 100)}%` }} />
             </div>
           </MetricCard>
 
           <MetricCard
             label="Customer Growth Rate"
-            value={customerGrowth.value}
+            value={cgValue}
             unit="% QoQ"
-            change={customerGrowth.change}
-            subtitle={`${customerGrowth.totalCustomers} total`}
+            change={cgChange ?? undefined}
+            subtitle={`${cgTotal} total`}
             drilldown={{
               title: "Customer Growth Rate",
               description: "Institutional adoption velocity",
@@ -126,26 +128,22 @@ const NorthStarPanel = () => {
           >
             <div className="flex items-end gap-[2px] h-10">
               {customerTrendSliced.map((v, i) => (
-                <div
-                  key={i}
-                  className="flex-1 rounded-sm bg-sage/30 transition-all hover:bg-sage/60"
-                  style={{ height: `${(v / Math.max(...customerTrendSliced)) * 100}%` }}
-                />
+                <div key={i} className="flex-1 rounded-sm bg-sage/30 transition-all hover:bg-sage/60" style={{ height: `${(v / Math.max(...customerTrendSliced)) * 100}%` }} />
               ))}
             </div>
           </MetricCard>
 
           <MetricCard
             label="Cash Runway"
-            value={cashRunway.value}
+            value={crValue}
             unit="months"
-            subtitle={`$${cashRunway.cashOnHand}M at $${cashRunway.burnRate}M/mo burn`}
+            subtitle={`$${crCash}M at $${crBurn}M/mo burn`}
             drilldown={{
               title: "Cash Runway",
               description: "Financial sustainability timeline",
               details: [
-                { label: "Cash on Hand", value: `$${cashRunway.cashOnHand}M` },
-                { label: "Monthly Burn Rate", value: `$${cashRunway.burnRate}M` },
+                { label: "Cash on Hand", value: `$${crCash}M` },
+                { label: "Monthly Burn Rate", value: `$${crBurn}M` },
                 { label: "Revenue (Monthly)", value: "$1.18M" },
                 { label: "Net Burn", value: "$620K" },
                 { label: "Last Funding Round", value: "Series B" },
@@ -154,10 +152,7 @@ const NorthStarPanel = () => {
             }}
           >
             <div className="mt-1 h-1.5 rounded-full bg-secondary">
-              <div
-                className="h-full rounded-full bg-amber transition-all"
-                style={{ width: `${Math.min((cashRunway.value / 36) * 100, 100)}%` }}
-              />
+              <div className="h-full rounded-full bg-amber transition-all" style={{ width: `${Math.min((crValue / 36) * 100, 100)}%` }} />
             </div>
           </MetricCard>
         </div>
