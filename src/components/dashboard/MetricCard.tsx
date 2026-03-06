@@ -133,6 +133,7 @@ const MetricCard = forwardRef<HTMLDivElement, MetricCardProps>(({ label, value, 
         )}
       </AnimatePresence>
     </>
+  );
 });
 
 MetricCard.displayName = "MetricCard";
