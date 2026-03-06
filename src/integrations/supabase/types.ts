@@ -14,7 +14,87 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      dashboard_metrics: {
+        Row: {
+          change_percent: number | null
+          id: string
+          metadata: Json | null
+          metric_key: string
+          metric_unit: string | null
+          metric_value: number
+          updated_at: string
+        }
+        Insert: {
+          change_percent?: number | null
+          id?: string
+          metadata?: Json | null
+          metric_key: string
+          metric_unit?: string | null
+          metric_value: number
+          updated_at?: string
+        }
+        Update: {
+          change_percent?: number | null
+          id?: string
+          metadata?: Json | null
+          metric_key?: string
+          metric_unit?: string | null
+          metric_value?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ecosystem_metrics: {
+        Row: {
+          carbon: number | null
+          hectares: number | null
+          id: string
+          month: string
+          projects: number | null
+          recorded_at: string
+        }
+        Insert: {
+          carbon?: number | null
+          hectares?: number | null
+          id?: string
+          month: string
+          projects?: number | null
+          recorded_at?: string
+        }
+        Update: {
+          carbon?: number | null
+          hectares?: number | null
+          id?: string
+          month?: string
+          projects?: number | null
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      strategic_alerts: {
+        Row: {
+          alert_type: string
+          created_at: string
+          id: string
+          title: string
+          value: string
+        }
+        Insert: {
+          alert_type: string
+          created_at?: string
+          id?: string
+          title: string
+          value: string
+        }
+        Update: {
+          alert_type?: string
+          created_at?: string
+          id?: string
+          title?: string
+          value?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
