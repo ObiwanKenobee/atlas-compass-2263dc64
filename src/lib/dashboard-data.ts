@@ -132,3 +132,43 @@ export const strategicAlerts = [
     time: "3 days ago",
   },
 ];
+
+export const pipelineData = {
+  stages: [
+    { name: "Leads", count: 248, value: "$42.1M", conversionRate: 38 },
+    { name: "Qualified", count: 94, value: "$28.6M", conversionRate: 52 },
+    { name: "Proposal", count: 49, value: "$18.2M", conversionRate: 61 },
+    { name: "Closed Won", count: 30, value: "$11.1M", conversionRate: null },
+  ],
+  totalValue: "$42.1M",
+  avgDealSize: "$370K",
+  winRate: 34,
+};
+
+export const customerHealthData = {
+  summary: {
+    healthy: 218,
+    atRisk: 42,
+    critical: 8,
+    avgNps: 72,
+  },
+  customers: [
+    { name: "Nordic Climate Fund", healthScore: 95, nps: 9, usage: 94, arr: "$2.8M", churnRisk: "low" as const },
+    { name: "Amazon Conservation Corp", healthScore: 88, nps: 8, usage: 87, arr: "$1.9M", churnRisk: "low" as const },
+    { name: "EU Green Transition Office", healthScore: 82, nps: 8, usage: 79, arr: "$2.1M", churnRisk: "low" as const },
+    { name: "TerraVerde Capital", healthScore: 74, nps: 7, usage: 68, arr: "$1.4M", churnRisk: "medium" as const },
+    { name: "Pacific Reforestation Alliance", healthScore: 61, nps: 6, usage: 52, arr: "$890K", churnRisk: "medium" as const },
+    { name: "Sahel Restoration Initiative", healthScore: 45, nps: 5, usage: 34, arr: "$620K", churnRisk: "high" as const },
+    { name: "Southeast Asia Carbon Trust", healthScore: 38, nps: 4, usage: 28, arr: "$540K", churnRisk: "high" as const },
+    { name: "Cerrado Agricultural Cooperative", healthScore: 91, nps: 9, usage: 91, arr: "$1.6M", churnRisk: "low" as const },
+  ],
+};
+
+export const kpiTargets = [
+  { name: "ARR", actual: 14.2, target: 18, actualFormatted: "$14.2M", targetFormatted: "$18M", status: "at_risk" as const },
+  { name: "NRR", actual: 127, target: 130, actualFormatted: "127%", targetFormatted: "130%", status: "on_track" as const },
+  { name: "Activation", actual: 73, target: 80, actualFormatted: "73%", targetFormatted: "80%", status: "at_risk" as const },
+  { name: "Hectares", actual: 2.4, target: 3.0, actualFormatted: "2.4M", targetFormatted: "3.0M", status: "on_track" as const },
+  { name: "Carbon", actual: 847, target: 1000, actualFormatted: "847K", targetFormatted: "1M", status: "on_track" as const },
+  { name: "Win Rate", actual: 34, target: 40, actualFormatted: "34%", targetFormatted: "40%", status: "behind" as const },
+];
