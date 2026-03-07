@@ -18,6 +18,9 @@ import KpiTargetPanel from "@/components/dashboard/KpiTargetPanel";
 import DataExportPanel from "@/components/dashboard/DataExportPanel";
 
 const Index = () => {
+  useRealtimeDashboard();
+
+  return (
   return (
     <div className="min-h-screen bg-background">
       <DashboardHeader />
