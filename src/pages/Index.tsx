@@ -1,3 +1,6 @@
+import { useAuth } from "@/hooks/use-auth";
+import { useRealtimeDashboard } from "@/hooks/use-realtime-dashboard";
+import { useNavigate } from "react-router-dom";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import NorthStarPanel from "@/components/dashboard/NorthStarPanel";
 import MarketAdoptionPanel from "@/components/dashboard/MarketAdoptionPanel";
@@ -5,6 +8,10 @@ import ProductValuePanel from "@/components/dashboard/ProductValuePanel";
 import EcosystemPanel from "@/components/dashboard/EcosystemPanel";
 import OperationalPanel from "@/components/dashboard/OperationalPanel";
 import StrategicAlerts from "@/components/dashboard/StrategicAlerts";
+import RevenuePipelinePanel from "@/components/dashboard/RevenuePipelinePanel";
+import CustomerHealthPanel from "@/components/dashboard/CustomerHealthPanel";
+import KpiTargetPanel from "@/components/dashboard/KpiTargetPanel";
+import DataExportPanel from "@/components/dashboard/DataExportPanel";
 import RevenuePipelinePanel from "@/components/dashboard/RevenuePipelinePanel";
 import CustomerHealthPanel from "@/components/dashboard/CustomerHealthPanel";
 import KpiTargetPanel from "@/components/dashboard/KpiTargetPanel";
