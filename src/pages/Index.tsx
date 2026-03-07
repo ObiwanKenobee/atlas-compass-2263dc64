@@ -1,3 +1,4 @@
+import { useRealtimeDashboard } from "@/hooks/use-realtime-dashboard";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import NorthStarPanel from "@/components/dashboard/NorthStarPanel";
 import MarketAdoptionPanel from "@/components/dashboard/MarketAdoptionPanel";
@@ -11,6 +12,8 @@ import KpiTargetPanel from "@/components/dashboard/KpiTargetPanel";
 import DataExportPanel from "@/components/dashboard/DataExportPanel";
 
 const Index = () => {
+  useRealtimeDashboard();
+
   return (
     <div className="min-h-screen bg-background">
       <DashboardHeader />
