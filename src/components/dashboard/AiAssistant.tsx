@@ -1,9 +1,12 @@
-import { useState, useRef, useEffect } from "react";
-import { MessageSquare, X, Send, Bot, User, Loader2 } from "lucide-react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { MessageSquare, X, Send, Bot, User, Loader2, Plus, History, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/use-auth";
 
 type Msg = { role: "user" | "assistant"; content: string };
+type Conversation = { id: string; title: string; created_at: string };
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/dashboard-chat`;
 
@@ -73,7 +76,11 @@ async function streamChat({
 }
 
 const AiAssistant = () => {
+  const { user } = useAuth();
   const [open, setOpen] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -83,6 +90,55 @@ const AiAssistant = () => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages]);
 
+  // Load conversations list
+  const loadConversations = useCallback(async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from("chat_conversations")
+      .select("id, title, created_at")
+      .eq("user_id", user.id)
+      .order("updated_at", { ascending: false })
+      .limit(20);
+    if (data) setConversations(data);
+  }, [user]);
+
+  // Load messages for a conversation
+  const loadMessages = useCallback(async (conversationId: string) => {
+    const { data } = await supabase
+      .from("chat_messages")
+      .select("role, content")
+      .eq("conversation_id", conversationId)
+      .order("created_at", { ascending: true });
+    if (data) setMessages(data as Msg[]);
+  }, []);
+
+  useEffect(() => {
+    if (open && user) loadConversations();
+  }, [open, user, loadConversations]);
+
+  const startNewConversation = () => {
+    setActiveConversationId(null);
+    setMessages([]);
+    setShowHistory(false);
+  };
+
+  const selectConversation = async (conv: Conversation) => {
+    setActiveConversationId(conv.id);
+    await loadMessages(conv.id);
+    setShowHistory(false);
+  };
+
+  const deleteConversation = async (convId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    await supabase.from("chat_conversations").delete().eq("id", convId);
+    if (activeConversationId === convId) startNewConversation();
+    loadConversations();
+  };
+
+  const persistMessage = async (conversationId: string, role: string, content: string) => {
+    await supabase.from("chat_messages").insert({ conversation_id: conversationId, role, content });
+  };
+
   const send = async (text: string) => {
     if (!text.trim() || isLoading) return;
     const userMsg: Msg = { role: "user", content: text.trim() };
@@ -90,6 +146,24 @@ const AiAssistant = () => {
     setMessages(allMessages);
     setInput("");
     setIsLoading(true);
+
+    // Create or reuse conversation
+    let convId = activeConversationId;
+    if (!convId && user) {
+      const title = text.trim().slice(0, 60);
+      const { data } = await supabase
+        .from("chat_conversations")
+        .insert({ user_id: user.id, title })
+        .select("id")
+        .single();
+      if (data) {
+        convId = data.id;
+        setActiveConversationId(convId);
+      }
+    }
+
+    // Persist user message
+    if (convId) await persistMessage(convId, "user", text.trim());
 
     let assistantSoFar = "";
     const upsert = (chunk: string) => {
@@ -103,10 +177,18 @@ const AiAssistant = () => {
       });
     };
 
+    const finalConvId = convId;
     await streamChat({
       messages: allMessages,
       onDelta: upsert,
-      onDone: () => setIsLoading(false),
+      onDone: async () => {
+        setIsLoading(false);
+        if (finalConvId && assistantSoFar) {
+          await persistMessage(finalConvId, "assistant", assistantSoFar);
+          await supabase.from("chat_conversations").update({ updated_at: new Date().toISOString() }).eq("id", finalConvId);
+        }
+        loadConversations();
+      },
       onError: (err) => {
         setMessages((prev) => [...prev, { role: "assistant", content: `⚠️ ${err}` }]);
         setIsLoading(false);
@@ -143,10 +225,55 @@ const AiAssistant = () => {
                 <Bot className="h-4 w-4 text-sage" />
                 <span className="text-xs font-semibold uppercase tracking-wider text-foreground">Atlas AI</span>
               </div>
-              <button onClick={() => setOpen(false)} className="rounded-md p-1 text-muted-foreground hover:bg-secondary hover:text-foreground">
-                <X className="h-4 w-4" />
-              </button>
+              <div className="flex items-center gap-1">
+                {user && (
+                  <>
+                    <button onClick={() => setShowHistory(!showHistory)} className="rounded-md p-1 text-muted-foreground hover:bg-secondary hover:text-foreground" title="Chat history">
+                      <History className="h-4 w-4" />
+                    </button>
+                    <button onClick={startNewConversation} className="rounded-md p-1 text-muted-foreground hover:bg-secondary hover:text-foreground" title="New chat">
+                      <Plus className="h-4 w-4" />
+                    </button>
+                  </>
+                )}
+                <button onClick={() => { setOpen(false); setShowHistory(false); }} className="rounded-md p-1 text-muted-foreground hover:bg-secondary hover:text-foreground">
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
             </div>
+
+            {/* History sidebar */}
+            <AnimatePresence>
+              {showHistory && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  className="overflow-hidden border-b border-border"
+                >
+                  <div className="max-h-[200px] overflow-y-auto p-2 space-y-1">
+                    {conversations.length === 0 && (
+                      <p className="px-2 py-3 text-center text-[11px] text-muted-foreground">No previous conversations</p>
+                    )}
+                    {conversations.map((c) => (
+                      <div
+                        key={c.id}
+                        onClick={() => selectConversation(c)}
+                        className={`group flex items-center justify-between rounded-md px-2.5 py-2 text-[11px] cursor-pointer transition-colors hover:bg-secondary ${activeConversationId === c.id ? "bg-secondary text-foreground" : "text-muted-foreground"}`}
+                      >
+                        <span className="truncate flex-1">{c.title}</span>
+                        <button
+                          onClick={(e) => deleteConversation(c.id, e)}
+                          className="ml-2 shrink-0 opacity-0 group-hover:opacity-100 rounded p-0.5 text-muted-foreground hover:text-destructive transition-opacity"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* Messages */}
             <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto p-4">
