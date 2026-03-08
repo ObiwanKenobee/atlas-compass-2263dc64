@@ -1,5 +1,6 @@
 import { useRealtimeDashboard } from "@/hooks/use-realtime-dashboard";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
+import ExecutiveBriefingPanel from "@/components/dashboard/ExecutiveBriefingPanel";
 import NorthStarPanel from "@/components/dashboard/NorthStarPanel";
 import MarketAdoptionPanel from "@/components/dashboard/MarketAdoptionPanel";
 import ProductValuePanel from "@/components/dashboard/ProductValuePanel";

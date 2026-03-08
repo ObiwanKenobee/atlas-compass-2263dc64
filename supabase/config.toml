@@ -1,1 +1,7 @@
 project_id = "ugzbikyrmoetvfmmpjfk"
+
+[functions.kpi-alert-check]
+verify_jwt = false
+
+[functions.executive-briefing]
+verify_jwt = false
