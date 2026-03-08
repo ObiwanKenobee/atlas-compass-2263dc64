@@ -95,6 +95,12 @@ const AdminPage = () => {
           <div className="flex items-center gap-3">
             <span className="text-xs text-muted-foreground">{user?.email}</span>
             <button
+              onClick={() => navigate("/settings")}
+              className="flex items-center gap-1 rounded-md px-2.5 py-1.5 text-[10px] uppercase tracking-wider text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+            >
+              <Settings className="h-3 w-3" /> Settings
+            </button>
+            <button
               onClick={() => navigate("/")}
               className="flex items-center gap-1 rounded-md px-2.5 py-1.5 text-[10px] uppercase tracking-wider text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
             >
