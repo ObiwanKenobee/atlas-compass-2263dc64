@@ -11,6 +11,8 @@ import RevenuePipelinePanel from "@/components/dashboard/RevenuePipelinePanel";
 import CustomerHealthPanel from "@/components/dashboard/CustomerHealthPanel";
 import KpiTargetPanel from "@/components/dashboard/KpiTargetPanel";
 import DataExportPanel from "@/components/dashboard/DataExportPanel";
+import PdfReportButton from "@/components/dashboard/PdfReportButton";
+import AiAssistant from "@/components/dashboard/AiAssistant";
 
 const Index = () => {
   useRealtimeDashboard();
@@ -19,7 +21,10 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <DashboardHeader />
       <main className="mx-auto max-w-[1440px] space-y-8 px-6 py-8 lg:px-8">
-        <ExecutiveBriefingPanel />
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex-1"><ExecutiveBriefingPanel /></div>
+          <PdfReportButton />
+        </div>
         <NorthStarPanel />
         <KpiTargetPanel />
         <RevenuePipelinePanel />
