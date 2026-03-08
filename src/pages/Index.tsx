@@ -36,6 +36,7 @@ const Index = () => {
         <StrategicAlerts />
         <DataExportPanel />
       </main>
+      <AiAssistant />
     </div>
   );
 };

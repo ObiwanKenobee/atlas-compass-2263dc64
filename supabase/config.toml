@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.executive-briefing]
 verify_jwt = false
+
+[functions.dashboard-chat]
+verify_jwt = false
