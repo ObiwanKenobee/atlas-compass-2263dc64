@@ -1,5 +1,6 @@
 import { useRealtimeDashboard } from "@/hooks/use-realtime-dashboard";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
+import ExecutiveBriefingPanel from "@/components/dashboard/ExecutiveBriefingPanel";
 import NorthStarPanel from "@/components/dashboard/NorthStarPanel";
 import MarketAdoptionPanel from "@/components/dashboard/MarketAdoptionPanel";
 import ProductValuePanel from "@/components/dashboard/ProductValuePanel";
@@ -18,6 +19,7 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <DashboardHeader />
       <main className="mx-auto max-w-[1440px] space-y-8 px-6 py-8 lg:px-8">
+        <ExecutiveBriefingPanel />
         <NorthStarPanel />
         <KpiTargetPanel />
         <RevenuePipelinePanel />
