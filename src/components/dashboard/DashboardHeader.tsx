@@ -2,6 +2,7 @@ import { Activity, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ThemeToggle from "@/components/ThemeToggle";
+import NotificationInbox from "./NotificationInbox";
 
 const DashboardHeader = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -37,6 +38,7 @@ const DashboardHeader = () => {
             </span>
           </div>
           <span className="hidden text-xs text-muted-foreground sm:block">{formatted}</span>
+          <NotificationInbox />
           <ThemeToggle />
           <button
             className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground sm:hidden"
