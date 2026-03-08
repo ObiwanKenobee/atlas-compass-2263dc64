@@ -19,6 +19,7 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <DashboardHeader />
       <main className="mx-auto max-w-[1440px] space-y-8 px-6 py-8 lg:px-8">
+        <ExecutiveBriefingPanel />
         <NorthStarPanel />
         <KpiTargetPanel />
         <RevenuePipelinePanel />
