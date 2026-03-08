@@ -2,6 +2,7 @@ import { Activity, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ThemeToggle from "@/components/ThemeToggle";
+import NotificationInbox from "./NotificationInbox";
 
 const DashboardHeader = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
