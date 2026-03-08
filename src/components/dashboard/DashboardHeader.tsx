@@ -38,6 +38,7 @@ const DashboardHeader = () => {
             </span>
           </div>
           <span className="hidden text-xs text-muted-foreground sm:block">{formatted}</span>
+          <NotificationInbox />
           <ThemeToggle />
           <button
             className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground sm:hidden"
